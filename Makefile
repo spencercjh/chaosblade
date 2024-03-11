@@ -94,7 +94,7 @@ help:
 
 ##@ Build
 #build: pre_build cli nsexec os cloud middleware cri cplus java kubernetes package check_yaml  ## Build all scenarios
-build: pre_build cli nsexec os middleware cri kubernetes package check_yaml  ## Build all scenarios
+build: pre_build cli nsexec os kubernetes package check_yaml  ## Build all scenarios
 #build: pre_build cli nsexec os cloud middleware cri cplus java kubernetes upx package check_yaml  ## Build all scenarios
 
 # for example: make build_with cli
