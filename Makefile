@@ -61,8 +61,8 @@ BLADE_EXEC_CRI_PROJECT=https://github.com/chaosblade-io/chaosblade-exec-cri.git
 BLADE_EXEC_CRI_BRANCH=main
 
 # chaosblade-exec-kubernetes
-BLADE_OPERATOR_PROJECT=https://github.com/chaosblade-io/chaosblade-operator.git
-BLADE_OPERATOR_BRANCH=master
+BLADE_OPERATOR_PROJECT=https://github.com/spencercjh/chaosblade-operator.git
+BLADE_OPERATOR_BRANCH=caijiahao01/dev
 
 # chaosblade-exec-jvm
 BLADE_EXEC_JVM_PROJECT=https://github.com/chaosblade-io/chaosblade-exec-jvm.git
