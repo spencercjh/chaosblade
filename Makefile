@@ -93,7 +93,8 @@ help:
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>...\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-20s\033[0m  %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ Build
-build: pre_build cli nsexec os cloud middleware cri cplus java kubernetes package check_yaml  ## Build all scenarios
+#build: pre_build cli nsexec os cloud middleware cri cplus java kubernetes package check_yaml  ## Build all scenarios
+build: pre_build cli nsexec os middleware cri kubernetes package check_yaml  ## Build all scenarios
 #build: pre_build cli nsexec os cloud middleware cri cplus java kubernetes upx package check_yaml  ## Build all scenarios
 
 # for example: make build_with cli
@@ -126,7 +127,7 @@ cli: ## Build blade cli
 	$(GO) build $(GO_FLAGS) -o $(BUILD_TARGET_PKG_DIR)/blade ./cli
 
 nsexec: ## Build nsexecgo
-	/usr/local/musl/bin/musl-gcc -static nsexec.c -o $(BUILD_TARGET_PKG_DIR)/bin/nsexec
+	/opt/homebrew/bin/aarch64-linux-musl-gcc -static nsexec.c -o $(BUILD_TARGET_PKG_DIR)/bin/nsexec
 
 os: ## Build basic resource experimental scenarios.
 ifneq ($(BUILD_TARGET_CACHE)/chaosblade-exec-os, $(wildcard $(BUILD_TARGET_CACHE)/chaosblade-exec-os))
@@ -218,9 +219,10 @@ build_image: ## Build chaosblade-tool image
 	rm -rf $(BUILD_IMAGE_PATH)/$(BUILD_TARGET_DIR_NAME)
 	cp -R $(BUILD_TARGET_PKG_NAME) $(BUILD_IMAGE_PATH)
 	tar zxvf $(BUILD_TARGET_PKG_NAME) -C $(BUILD_IMAGE_PATH)
-	docker build -f $(BUILD_IMAGE_PATH)/Dockerfile \
+	docker buildx build -f $(BUILD_IMAGE_PATH)/Dockerfile \
+		--platform=linux/amd64 \
 		--build-arg BLADE_VERSION=$(BLADE_VERSION) \
-		-t chaosbladeio/chaosblade-tool:$(BLADE_VERSION) \
+		-t ghcr.io/chaosblade-io/chaosblade-tool:$(BLADE_VERSION) \
 		$(BUILD_IMAGE_PATH)
 	rm -rf $(BUILD_IMAGE_PATH)/$(BUILD_TARGET_DIR_NAME)
 
@@ -228,9 +230,10 @@ build_image_arm: ## Build chaosblade-tool-arm image
 	rm -rf $(BUILD_ARM_IMAGE_PATH)/$(BUILD_TARGET_DIR_NAME)
 	cp -R $(BUILD_TARGET_PKG_NAME) $(BUILD_ARM_IMAGE_PATH)
 	tar zxvf $(BUILD_TARGET_PKG_NAME) -C $(BUILD_ARM_IMAGE_PATH)
-	docker build -f $(BUILD_ARM_IMAGE_PATH)/Dockerfile \
+	docker buildx build -f $(BUILD_ARM_IMAGE_PATH)/Dockerfile \
+		--platform=linux/arm64 \
 		--build-arg BLADE_VERSION=$(BLADE_VERSION) \
-		-t chaosbladeio/chaosblade-tool-arm64:$(BLADE_VERSION) \
+		-t ghcr.io/chaosblade-io/chaosblade-tool-arm64:$(BLADE_VERSION) \
 		$(BUILD_ARM_IMAGE_PATH)
 	rm -rf $(BUILD_ARM_IMAGE_PATH)/$(BUILD_TARGET_DIR_NAME)
 

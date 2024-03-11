@@ -1,4 +1,4 @@
-FROM multiarch/alpine:arm64-edge
+FROM multiarch/alpine:arm64-latest-stable
 LABEL maintainer="Changjun Xiao"
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories

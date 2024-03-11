@@ -19,12 +19,13 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"path"
+
 	"github.com/chaosblade-io/chaosblade-exec-cri/exec"
 	"github.com/chaosblade-io/chaosblade-operator/exec/model"
 	"github.com/chaosblade-io/chaosblade-spec-go/log"
-	"github.com/chaosblade-io/chaosblade/exec/middleware"
 	"github.com/chaosblade-io/chaosblade/exec/cloud"
-	"path"
+	"github.com/chaosblade-io/chaosblade/exec/middleware"
 
 	"github.com/chaosblade-io/chaosblade-spec-go/channel"
 	"github.com/chaosblade-io/chaosblade-spec-go/spec"
@@ -140,6 +141,7 @@ func (ec *baseExpCommandService) registerOsExpCommands() []*modelCommand {
 	file := path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-os-spec-%s.yaml", version.Ver))
 	models, err := specutil.ParseSpecsToModel(file, os.NewExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse os spec failed, %v", err)
 		return nil
 	}
 	osCommands := make([]*modelCommand, 0)
@@ -151,12 +153,12 @@ func (ec *baseExpCommandService) registerOsExpCommands() []*modelCommand {
 	return osCommands
 }
 
-
 // registerMiddlewareExpCommands
 func (ec *baseExpCommandService) registerMiddlewareExpCommands() []*modelCommand {
 	file := path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-middleware-spec-%s.yaml", version.Ver))
 	models, err := specutil.ParseSpecsToModel(file, middleware.NewExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse middleware spec failed, %v", err)
 		return nil
 	}
 	middlewareCommands := make([]*modelCommand, 0)
@@ -167,11 +169,13 @@ func (ec *baseExpCommandService) registerMiddlewareExpCommands() []*modelCommand
 	}
 	return middlewareCommands
 }
+
 // registerCloudExpCommands
 func (ec *baseExpCommandService) registerCloudExpCommands() []*modelCommand {
 	file := path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-cloud-spec-%s.yaml", version.Ver))
 	models, err := specutil.ParseSpecsToModel(file, cloud.NewExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse cloud spec failed, %v", err)
 		return nil
 	}
 	cloudCommands := make([]*modelCommand, 0)
@@ -189,6 +193,7 @@ func (ec *baseExpCommandService) registerJvmExpCommands() []*modelCommand {
 	file := path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-jvm-spec-%s.yaml", version.Ver))
 	models, err := util.ParseSpecsToModel(file, jvm.NewExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse jvm spec failed, %v", err)
 		return nil
 	}
 	jvmCommands := make([]*modelCommand, 0)
@@ -205,6 +210,7 @@ func (ec *baseExpCommandService) registerCplusExpCommands() []*modelCommand {
 	file := path.Join(util.GetYamlHome(), "chaosblade-cplus-spec.yaml")
 	models, err := util.ParseSpecsToModel(file, cplus.NewExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse cplus spec failed, %v", err)
 		return nil
 	}
 	cplusCommands := make([]*modelCommand, 0)
@@ -221,6 +227,7 @@ func (ec *baseExpCommandService) registerDockerExpCommands() []*modelCommand {
 	file := path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-docker-spec-%s.yaml", version.Ver))
 	models, err := specutil.ParseSpecsToModel(file, docker.NewExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse docker spec failed, %v", err)
 		return nil
 	}
 	dockerSpec := docker.NewCommandModelSpec()
@@ -234,14 +241,15 @@ func (ec *baseExpCommandService) registerDockerExpCommands() []*modelCommand {
 	file = path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-jvm-spec-%s.yaml", version.Ver))
 	models, err = util.ParseSpecsToModel(file, docker.NewExecutor())
 	if err != nil {
-		return nil
-	}
-	for idx := range models.Models {
-		model := &models.Models[idx]
-		model.ExpScope = "docker"
-		spec.AddFlagsToModelSpec(exec.GetExecInContainerFlags, model)
-		command := ec.registerExpCommand(model, dockerSpec.Name())
-		modelCommands = append(modelCommands, command)
+		log.Errorf(context.TODO(), "parse docker jvm spec failed, %v", err)
+	} else {
+		for idx := range models.Models {
+			model := &models.Models[idx]
+			model.ExpScope = "docker"
+			spec.AddFlagsToModelSpec(exec.GetExecInContainerFlags, model)
+			command := ec.registerExpCommand(model, dockerSpec.Name())
+			modelCommands = append(modelCommands, command)
+		}
 	}
 
 	dockerCmd := ec.registerExpCommand(dockerSpec, "")
@@ -265,6 +273,7 @@ func (ec *baseExpCommandService) registerK8sExpCommands() []*modelCommand {
 	file := path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-k8s-spec-%s.yaml", version.Ver))
 	models, err := specutil.ParseSpecsToModel(file, kubernetes.NewComposeExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse k8s spec failed, %v", err)
 		return nil
 	}
 	k8sSpec := kubernetes.NewCommandModelSpec()
@@ -278,14 +287,15 @@ func (ec *baseExpCommandService) registerK8sExpCommands() []*modelCommand {
 	file = path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-jvm-spec-%s.yaml", version.Ver))
 	models, err = util.ParseSpecsToModel(file, kubernetes.NewExecutor())
 	if err != nil {
-		return nil
-	}
-	for idx := range models.Models {
-		model := &models.Models[idx]
-		model.ExpScope = "container"
-		spec.AddFlagsToModelSpec(GetResourceFlags, model)
-		command := ec.registerExpCommand(model, k8sSpec.Name())
-		modelCommands = append(modelCommands, command)
+		log.Errorf(context.TODO(), "parse k8s jvm spec failed, %v", err)
+	} else {
+		for idx := range models.Models {
+			model := &models.Models[idx]
+			model.ExpScope = "container"
+			spec.AddFlagsToModelSpec(GetResourceFlags, model)
+			command := ec.registerExpCommand(model, k8sSpec.Name())
+			modelCommands = append(modelCommands, command)
+		}
 	}
 
 	k8sCmd := ec.registerExpCommand(k8sSpec, "")
@@ -302,6 +312,7 @@ func (ec *baseExpCommandService) registerCriExpCommands() []*modelCommand {
 	file := path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-cri-spec-%s.yaml", version.Ver))
 	models, err := specutil.ParseSpecsToModel(file, cri.NewExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse cri spec failed, %v", err)
 		return nil
 	}
 	criSpec := cri.NewCommandModelSpec()
@@ -315,14 +326,16 @@ func (ec *baseExpCommandService) registerCriExpCommands() []*modelCommand {
 	file = path.Join(util.GetYamlHome(), fmt.Sprintf("chaosblade-jvm-spec-%s.yaml", version.Ver))
 	models, err = util.ParseSpecsToModel(file, cri.NewExecutor())
 	if err != nil {
+		log.Errorf(context.TODO(), "parse cri jvm spec failed, %v", err)
 		return nil
-	}
-	for idx := range models.Models {
-		model := &models.Models[idx]
-		model.ExpScope = "cri"
-		spec.AddFlagsToModelSpec(exec.GetExecInContainerFlags, model)
-		command := ec.registerExpCommand(model, criSpec.Name())
-		modelCommands = append(modelCommands, command)
+	} else {
+		for idx := range models.Models {
+			model := &models.Models[idx]
+			model.ExpScope = "cri"
+			spec.AddFlagsToModelSpec(exec.GetExecInContainerFlags, model)
+			command := ec.registerExpCommand(model, criSpec.Name())
+			modelCommands = append(modelCommands, command)
+		}
 	}
 
 	criCmd := ec.registerExpCommand(criSpec, "")
@@ -433,7 +446,7 @@ func addTimeoutFlag(flags []spec.ExpFlagSpec) []spec.ExpFlagSpec {
 func checkError(err error) {
 	if err != nil {
 		log.Warnf(context.Background(), err.Error())
-		//log.V(-1).Info(err.Error())
+		// log.V(-1).Info(err.Error())
 	}
 }
 
