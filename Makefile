@@ -253,7 +253,7 @@ upx: ## Upx compression by docker image
 	docker run --rm \
     		-w $(shell pwd)/$(BUILD_TARGET_PKG_DIR) \
     		-v $(shell pwd)/$(BUILD_TARGET_PKG_DIR):$(shell pwd)/$(BUILD_TARGET_PKG_DIR) \
-     		chaosbladeio/chaosblade-upx:3.96 \
+     		chaosblade-io/chaosblade-upx:3.96 \
     		--best \
     		blade $(shell pwd)/$(BUILD_TARGET_PKG_DIR)/bin/*
 
@@ -279,7 +279,7 @@ build_linux_with_arg:
 		-w /go/src/github.com/chaosblade-io/chaosblade \
 		-v ~/.m2/repository:/root/.m2/repository \
         -v $(shell pwd):/go/src/github.com/chaosblade-io/chaosblade \
-		chaosbladeio/chaosblade-build-musl:latest build_with $$ARGS
+		chaosblade-io/chaosblade-build-musl:latest build_with $$ARGS
 
 ## Select scenario build linux arm version by docker image
 build_linux_arm_with_arg:
@@ -289,7 +289,7 @@ build_linux_arm_with_arg:
 		-w /go/src/github.com/chaosblade-io/chaosblade \
 		-v ~/.m2/repository:/root/.m2/repository \
 		-v $(shell pwd):/go/src/github.com/chaosblade-io/chaosblade \
-		chaosbladeio/chaosblade-build-arm:latest build_with $$ARGS
+		chaosblade-io/chaosblade-build-arm:latest build_with $$ARGS
 
 # create cache dir
 mkdir_build_target:
